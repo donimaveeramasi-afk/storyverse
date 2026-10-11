@@ -1,0 +1,953 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storyverse | My Story Creator</title>
+
+<style>
+:root {
+  --accent: #a18aff;
+  --bg: #101225;
+  --card: #1c203a;
+  --text: #f8f7ff;
+  --muted: #b9bdd7;
+  --border: #353a5b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  transition: background .3s;
+}
+
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+
+.hidden { display: none !important; }
+
+button:focus-visible, input:focus-visible,
+textarea:focus-visible, select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.btn {
+  padding: 12px 17px;
+  border: 0;
+  border-radius: 11px;
+  color: white;
+  background: var(--accent);
+  font-weight: bold;
+}
+
+.btn:hover { filter: brightness(1.12); }
+
+.btn.secondary { background: #343958; }
+.btn.danger { background: #a64061; }
+.btn.small { padding: 8px 11px; font-size: 13px; }
+
+.logo {
+  font-size: 23px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: var(--accent);
+}
+
+.welcome {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 25px;
+  text-align: center;
+  background:
+    linear-gradient(#1012259c, #101225e8),
+    url("images/anime-girl-starry-sky.png") center/cover,
+    #101225;
+}
+
+.welcome-content { max-width: 700px; }
+
+.welcome h1 {
+  font-size: clamp(36px, 7vw, 66px);
+  line-height: 1.15;
+  margin: 25px 0 15px;
+}
+
+.welcome h1 span { color: var(--accent); }
+
+.welcome p {
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.welcome .btn { margin-top: 15px; }
+
+.app {
+  width: min(1200px, 100%);
+  padding: 24px;
+  margin: auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+header h2 { margin-bottom: 6px; }
+header p { color: var(--muted); margin-top: 0; }
+
+.header-actions, .actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+section { margin-top: 30px; }
+
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 17px;
+}
+
+.heading h2 { margin: 0; }
+
+.muted { color: var(--muted); }
+
+.themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 14px;
+}
+
+.theme-card {
+  overflow: hidden;
+  padding: 0;
+  text-align: left;
+  color: var(--text);
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 15px;
+}
+
+.theme-card.active { border-color: var(--accent); }
+
+.theme-card img {
+  display: block;
+  width: 100%;
+  height: 145px;
+  object-fit: cover;
+  background: #292d4b;
+}
+
+.theme-card span {
+  display: block;
+  padding: 12px;
+  font-weight: bold;
+}
+
+.theme-card .theme-description {
+  padding: 0 12px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.stat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.stat strong {
+  display: block;
+  font-size: 29px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.stat span { color: var(--muted); font-size: 14px; }
+
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+  gap: 18px;
+}
+
+.story-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.story-cover {
+  height: 175px;
+  padding: 15px;
+  display: flex;
+  align-items: end;
+  background-size: cover;
+  background-position: center;
+  background-color: #292d4b;
+  position: relative;
+}
+
+.story-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent, #101225bb);
+}
+
+.cover-emoji {
+  position: relative;
+  z-index: 1;
+  font-size: 37px;
+}
+
+.story-info { padding: 16px; }
+.story-info h3 { overflow-wrap: anywhere; }
+.story-info p {
+  color: var(--muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.tag {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #353957;
+  color: #e5dfff;
+  font-size: 12px;
+}
+
+.empty {
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: 15px;
+  padding: 35px 15px;
+  color: var(--muted);
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 22px;
+  border-radius: 18px;
+  max-width: 850px;
+  margin: 30px auto;
+}
+
+.panel h2 { margin-top: 0; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 13px;
+}
+
+.field.full { grid-column: 1 / -1; }
+
+label { font-weight: bold; font-size: 14px; }
+
+input, textarea, select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  background: #12152a;
+}
+
+textarea {
+  min-height: 230px;
+  line-height: 1.8;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.reader-title {
+  font-size: 32px;
+  overflow-wrap: anywhere;
+}
+
+.reader-content {
+  white-space: pre-wrap;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  display: grid;
+  place-items: center;
+  font-size: 35px;
+  border-radius: 50%;
+  background: #353957;
+  margin-bottom: 20px;
+}
+
+footer {
+  padding: 35px 10px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .app { padding: 15px; }
+  .form-grid, .stats { grid-template-columns: 1fr; }
+  .field.full { grid-column: auto; }
+  .header-actions { width: 100%; }
+  .header-actions .btn { flex: 1; }
+  .welcome h1 { font-size: 39px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- WELCOME PAGE -->
+<div id="welcome" class="welcome">
+  <div class="welcome-content">
+    <div class="logo">✦ STORYVERSE</div>
+    <h1>Your Ideas.<br>Your Characters.<br><span>Your Story.</span></h1>
+    <p>
+      A little space for your imagination.
+      Create characters, choose beautiful themes,
+      and turn your ideas into stories.
+    </p>
+    <button class="btn" id="getStarted">Get Started →</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="app hidden">
+
+  <header>
+    <div>
+      <div class="logo">✦ STORYVERSE</div>
+      <h2 id="greeting">Welcome, Storyteller!</h2>
+      <p>Create something magical today.</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn secondary" id="profileButton">My Profile</button>
+      <button class="btn" id="createButton">＋ Create Story</button>
+    </div>
+  </header>
+
+  <!-- PHOTO THEMES -->
+  <section id="dashboard">
+
+    <div class="heading">
+      <h2>Choose Your Theme 🎨</h2>
+      <span class="muted">Tap a picture to change your theme</span>
+    </div>
+
+    <div class="themes" id="themes">
+
+      <button class="theme-card active"
+        data-theme="purple"
+        data-photo="images/anime-girl-starry-sky.png">
+        <img src="images/anime-girl-starry-sky.png"
+          alt="Anime girl under a starry sky">
+        <span>🌌 Starry Dreams</span>
+        <div class="theme-description">Dreamy night skies</div>
+      </button>
+
+      <button class="theme-card"
+        data-theme="blue"
+        data-photo="images/anime-girl-riverside.png">
+        <img src="images/anime-girl-riverside.png"
+          alt="Anime girl beside a river">
+        <span>🌊 Blue Serenity</span>
+        <div class="theme-description">Peaceful blue worlds</div>
+      </button>
+
+      <button class="theme-card"
+        data-theme="pink"
+        data-photo="images/anime-girl-sunset.png">
+        <img src="images/anime-girl-sunset.png"
+          alt="Anime girl at sunset">
+        <span>🌸 Sunset Magic</span>
+        <div class="theme-description">Warm sunset colours</div>
+      </button>
+
+      <button class="theme-card"
+        data-theme="green"
+        data-photo="images/cat-window.png">
+        <img src="images/cat-window.png"
+          alt="Cat sitting beside a window">
+        <span>🐈 Cozy World</span>
+        <div class="theme-description">Cute and cozy stories</div>
+      </button>
+
+      <button class="theme-card"
+        data-theme="purple"
+        data-photo="images/cat-kitten.png">
+        <img src="images/cat-kitten.png"
+          alt="Cute kitten">
+        <span>🐾 Kitten Tales</span>
+        <div class="theme-description">A little cat magic</div>
+      </button>
+
+    </div>
+
+    <!-- STATISTICS -->
+    <section>
+      <div class="heading">
+        <h2>Your Writing Space ✨</h2>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <strong id="storyCount">0</strong>
+          <span>Total stories</span>
+        </div>
+        <div class="stat">
+          <strong id="characterCount">0</strong>
+          <span>Characters</span>
+        </div>
+        <div class="stat">
+          <strong id="wordCount">0</strong>
+          <span>Words written</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAVED STORIES -->
+    <section>
+      <div class="heading">
+        <div>
+          <h2>My Stories 📚</h2>
+          <p class="muted">Your imagination lives here.</p>
+        </div>
+        <button class="btn" id="createButton2">＋ New Story</button>
+      </div>
+
+      <div id="stories" class="story-grid"></div>
+
+      <div id="emptyState" class="empty">
+        <div style="font-size:42px">📖</div>
+        <h3>Your story journey starts here!</h3>
+        <p>Create your first story and save it.</p>
+        <button class="btn" id="firstStoryButton">Create My First Story</button>
+      </div>
+    </section>
+  </section>
+
+  <!-- CREATE / EDIT STORY -->
+  <section id="editor" class="panel hidden">
+    <h2 id="editorHeading">Create Your Story ✍️</h2>
+    <p class="muted">Every great story begins with an idea.</p>
+
+    <form id="storyForm">
+      <div class="form-grid">
+
+        <div class="field">
+          <label for="storyTitle">Story title *</label>
+          <input id="storyTitle" maxlength="100" required
+            placeholder="The Girl Under the Stars">
+        </div>
+
+        <div class="field">
+          <label for="characterName">Main character *</label>
+          <input id="characterName" maxlength="80" required
+            placeholder="Your character's name">
+        </div>
+
+        <div class="field">
+          <label for="genre">Genre</label>
+          <select id="genre">
+            <option>Fantasy</option>
+            <option>Adventure</option>
+            <option>Romance</option>
+            <option>Mystery</option>
+            <option>Drama</option>
+            <option>Fairy Tale</option>
+            <option>Comedy</option>
+            <option>Horror</option>
+            <option>Slice of Life</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="storyEmoji">Story symbol</label>
+          <select id="storyEmoji">
+            <option>🌙</option>
+            <option>🌸</option>
+            <option>🦋</option>
+            <option>🐈</option>
+            <option>⭐</option>
+            <option>🌊</option>
+            <option>🏰</option>
+            <option>🌧️</option>
+            <option>🪄</option>
+            <option>📖</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label for="storyDescription">Short description</label>
+          <input id="storyDescription" maxlength="250"
+            placeholder="What is your story about?">
+        </div>
+
+        <div class="field full">
+          <label for="storyContent">Write your story *</label>
+          <textarea id="storyContent" required
+            placeholder="Once upon a time..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn">Save Story ✨</button>
+        <button type="button" class="btn secondary" id="cancelEditor">Cancel</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- READ STORY -->
+  <section id="reader" class="panel hidden">
+    <div class="heading">
+      <h2>📖 Your Story</h2>
+      <button class="btn secondary" id="backButton">← Back</button>
+    </div>
+
+    <div id="readEmoji" style="font-size:42px"></div>
+    <h1 id="readTitle" class="reader-title"></h1>
+    <p id="readDetails" class="muted"></p>
+    <p id="readDescription"></p>
+    <hr style="border-color:var(--border);margin:25px 0">
+    <div id="readContent" class="reader-content"></div>
+
+    <div class="form-actions">
+      <button class="btn" id="editButton">Edit Story</button>
+      <button class="btn secondary" id="readerBackButton">Back to Stories</button>
+    </div>
+  </section>
+
+  <!-- PROFILE -->
+  <section id="profile" class="panel hidden">
+    <div class="profile-avatar">👤</div>
+    <h2>My Profile</h2>
+    <p class="muted">Make this writing space yours.</p>
+
+    <form id="profileForm">
+      <div class="field">
+        <label for="userName">Your storyteller name</label>
+        <input id="userName" maxlength="50" placeholder="Your name">
+      </div>
+
+      <div class="field">
+        <label for="userBio">About you</label>
+        <textarea id="userBio" maxlength="300"
+          style="min-height:100px"
+          placeholder="I love writing stories about..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn" type="submit">Save Profile</button>
+        <button class="btn secondary" type="button" id="cancelProfile">Cancel</button>
+      </div>
+    </form>
+  </section>
+
+  <footer>✦ STORYVERSE — Your imagination, your universe.</footer>
+</div>
+
+<script>
+"use strict";
+
+// STORAGE
+const STORY_KEY = "storyverse_stories_v2";
+const PROFILE_KEY = "storyverse_profile_v2";
+const THEME_KEY = "storyverse_theme_v2";
+const PHOTO_KEY = "storyverse_photo_v2";
+
+function loadData(key, fallback) {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+let stories = loadData(STORY_KEY, []);
+if (!Array.isArray(stories)) stories = [];
+
+let profile = loadData(PROFILE_KEY, {name: "", bio: ""});
+let editingId = null;
+let currentStoryId = null;
+let selectedPhoto =
+  localStorage.getItem(PHOTO_KEY) ||
+  "images/anime-girl-starry-sky.png";
+
+const $ = id => document.getElementById(id);
+
+// SCREEN NAVIGATION
+function showScreen(name) {
+  $("welcome").classList.add("hidden");
+  $("app").classList.remove("hidden");
+
+  ["dashboard", "editor", "reader", "profile"].forEach(id => {
+    $(id).classList.add("hidden");
+  });
+
+  if (name === "welcome") {
+    $("app").classList.add("hidden");
+    $("welcome").classList.remove("hidden");
+  } else {
+    $(name).classList.remove("hidden");
+  }
+
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+$("getStarted").addEventListener("click", () => {
+  showScreen("dashboard");
+  renderStories();
+});
+
+function openDashboard() {
+  renderStories();
+  showScreen("dashboard");
+}
+
+// THEME COLOURS
+const colours = {
+  purple: "#a18aff",
+  blue: "#4e9cff",
+  pink: "#ef75b5",
+  green: "#54c6a1"
+};
+
+function setColour(name) {
+  document.documentElement.style.setProperty(
+    "--accent", colours[name] || colours.purple
+  );
+  localStorage.setItem(THEME_KEY, name);
+}
+
+function setPhoto(photo) {
+  selectedPhoto = photo;
+  localStorage.setItem(PHOTO_KEY, photo);
+
+  document.querySelectorAll(".theme-card").forEach(button => {
+    button.classList.toggle(
+      "active", button.dataset.photo === photo
+    );
+  });
+
+  document.querySelectorAll(".story-cover").forEach(cover => {
+    cover.style.backgroundImage =
+      `linear-gradient(transparent, #101225bb), url("${photo}")`;
+  });
+
+  document.querySelector(".welcome").style.backgroundImage =
+    `linear-gradient(#10122599, #101225e8), url("${photo}")`;
+}
+
+// PHOTO THEMES
+document.querySelectorAll(".theme-card").forEach(button => {
+  button.addEventListener("click", () => {
+    setColour(button.dataset.theme);
+    setPhoto(button.dataset.photo);
+  });
+});
+
+// SAFE TEXT INSERTION
+function safeText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[character]);
+}
+
+// PROFILE
+function updateGreeting() {
+  $("greeting").textContent = profile.name
+    ? `Welcome, ${profile.name}!`
+    : "Welcome, Storyteller!";
+}
+
+function openProfile() {
+  $("userName").value = profile.name || "";
+  $("userBio").value = profile.bio || "";
+  showScreen("profile");
+}
+
+$("profileButton").addEventListener("click", openProfile);
+
+$("profileForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  profile = {
+    name: $("userName").value.trim(),
+    bio: $("userBio").value.trim()
+  };
+
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  updateGreeting();
+  openDashboard();
+});
+
+$("cancelProfile").addEventListener("click", openDashboard);
+
+// STORY EDITOR
+function openEditor(id = null) {
+  editingId = id;
+  $("storyForm").reset();
+
+  if (id !== null) {
+    const story = stories.find(item => item.id === id);
+    if (!story) return;
+
+    $("editorHeading").textContent = "Edit Your Story ✍️";
+    $("storyTitle").value = story.title;
+    $("characterName").value = story.character;
+    $("genre").value = story.genre;
+    $("storyEmoji").value = story.emoji || "📖";
+    $("storyDescription").value = story.description || "";
+    $("storyContent").value = story.content;
+  } else {
+    $("editorHeading").textContent = "Create Your Story ✍️";
+  }
+
+  showScreen("editor");
+}
+
+$("createButton").addEventListener("click", () => openEditor());
+$("createButton2").addEventListener("click", () => openEditor());
+$("firstStoryButton").addEventListener("click", () => openEditor());
+$("cancelEditor").addEventListener("click", openDashboard);
+
+// SAVE STORIES
+function persistStories() {
+  try {
+    localStorage.setItem(STORY_KEY, JSON.stringify(stories));
+    return true;
+  } catch (error) {
+    alert("Unable to save. Your browser storage may be full.");
+    return false;
+  }
+}
+
+$("storyForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const title = $("storyTitle").value.trim();
+  const character = $("characterName").value.trim();
+  const content = $("storyContent").value.trim();
+
+  if (!title || !character || !content) {
+    alert("Please complete all required fields.");
+    return;
+  }
+
+  const now = new Date().toISOString();
+
+  const data = {
+    title,
+    character,
+    genre: $("genre").value,
+    emoji: $("storyEmoji").value,
+    description: $("storyDescription").value.trim(),
+    content,
+    photo: selectedPhoto,
+    updatedAt: now
+  };
+
+  const previous = [...stories];
+
+  if (editingId !== null) {
+    const index = stories.findIndex(item => item.id === editingId);
+    if (index < 0) return;
+
+    stories[index] = {...stories[index], ...data};
+  } else {
+    stories.unshift({
+      id: Date.now().toString() + Math.random().toString(16).slice(2),
+      ...data,
+      createdAt: now
+    });
+  }
+
+  if (persistStories()) {
+    openDashboard();
+  } else {
+    stories = previous;
+  }
+});
+
+// STORY STATISTICS AND CARDS
+function renderStories() {
+  const container = $("stories");
+  container.innerHTML = "";
+
+  $("storyCount").textContent = stories.length;
+
+  const characters = new Set(
+    stories.map(story => story.character.trim().toLowerCase())
+  );
+
+  $("characterCount").textContent = characters.size;
+
+  $("wordCount").textContent = stories.reduce((total, story) => {
+    return total +
+      story.content.trim().split(/\s+/).filter(Boolean).length;
+  }, 0);
+
+  $("emptyState").classList.toggle("hidden", stories.length > 0);
+
+  stories.forEach(story => {
+    const card = document.createElement("article");
+    card.className = "story-card";
+
+    const cover = document.createElement("div");
+    cover.className = "story-cover";
+    cover.style.backgroundImage =
+      `linear-gradient(transparent, #101225bb), url("${story.photo || selectedPhoto}")`;
+
+    const emoji = document.createElement("span");
+    emoji.className = "cover-emoji";
+    emoji.textContent = story.emoji || "📖";
+    cover.appendChild(emoji);
+
+    const info = document.createElement("div");
+    info.className = "story-info";
+
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = story.genre;
+
+    const title = document.createElement("h3");
+    title.textContent = story.title;
+
+    const character = document.createElement("p");
+    character.textContent = "Character: " + story.character;
+
+    const description = document.createElement("p");
+    description.textContent = story.description ||
+      (story.content.slice(0, 100) +
+       (story.content.length > 100 ? "..." : ""));
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    function actionButton(label, className, callback) {
+      const button = document.createElement("button");
+      button.className = "btn small " + className;
+      button.textContent = label;
+      button.addEventListener("click", callback);
+      actions.appendChild(button);
+    }
+
+    actionButton("Read", "", () => openReader(story.id));
+    actionButton("Edit", "secondary", () => openEditor(story.id));
+    actionButton("Delete", "danger", () => deleteStory(story.id));
+
+    info.append(tag, title, character, description, actions);
+    card.append(cover, info);
+    container.appendChild(card);
+  });
+}
+
+// READ STORIES
+function openReader(id) {
+  const story = stories.find(item => item.id === id);
+  if (!story) return;
+
+  currentStoryId = id;
+  $("readEmoji").textContent = story.emoji || "📖";
+  $("readTitle").textContent = story.title;
+  $("readDetails").textContent =
+    story.genre + " · Main character: " + story.character;
+  $("readDescription").textContent = story.description || "";
+  $("readContent").textContent = story.content;
+
+  showScreen("reader");
+}
+
+function goBack() {
+  currentStoryId = null;
+  openDashboard();
+}
+
+$("backButton").addEventListener("click", goBack);
+$("readerBackButton").addEventListener("click", goBack);
+
+$("editButton").addEventListener("click", () => {
+  if (currentStoryId !== null) openEditor(currentStoryId);
+});
+
+// DELETE STORIES
+function deleteStory(id) {
+  const story = stories.find(item => item.id === id);
+  if (!story) return;
+
+  if (!confirm(`Delete "${story.title}"?`)) return;
+
+  const previous = stories;
+  stories = stories.filter(item => item.id !== id);
+
+  if (persistStories()) {
+    goBack();
+  } else {
+    stories = previous;
+  }
+}
+
+// STARTUP
+updateGreeting();
+renderStories();
+
+setColour(localStorage.getItem(THEME_KEY) || "purple");
+setPhoto(selectedPhoto);
+showScreen("welcome");
+</script>
+
+</body>
+</html>
